@@ -1,5 +1,6 @@
 {
-  "name": "hardhat-project",
+  "name": "escrow-smart-contract",
+  "description": "hardhat test project",
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "1.0.2",
     "hardhat": "2.11.1"
