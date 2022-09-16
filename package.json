@@ -1,6 +1,13 @@
 {
   "name": "escrow-smart-contract",
   "description": "hardhat test project",
+  "scripts": {
+    "compile": "npx hardhat compile --force",
+    "coverage": "npx hardhat coverage",
+    "test": "npx hardhat test",
+    "private-network": "npx hardhat node",
+    "deploy-dev": "npx hardhat run scripts/deploy.ts --network localhost"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "1.0.2",
     "hardhat": "2.11.1"
