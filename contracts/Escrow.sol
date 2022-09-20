@@ -8,8 +8,8 @@ contract Escrow {
     mapping(address => uint256) private _deposits;
     mapping(address => address) private _sender;
 
-    // TODO add validation if send amount is 0;
     function deposit(address payee) public payable {
+        require(msg.value > 0, "Send value is 0, please set value");
         uint256 amount = msg.value;
         _deposits[payee] = _deposits[payee] + amount;
         _sender[payee] = msg.sender;
