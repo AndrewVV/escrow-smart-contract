@@ -34,6 +34,19 @@ describe.only('Escrow', () => {
                     .withArgs(otherAccount.address, amount);
             });
         });
+
+        describe('Transfers', () => {
+            it('Should deposit the funds to the contract', async () => {
+                const { escrow, owner, otherAccount } = await loadFixture(deployFixture);
+                const amount = 1;
+      
+                await expect(escrow.deposit(otherAccount.address, { value: amount }))
+                    .to.changeEtherBalances(
+                        [owner, escrow],
+                        [-amount, amount]
+                    )
+            });
+        });
     })
 
 })
