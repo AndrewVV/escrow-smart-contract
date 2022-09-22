@@ -4,7 +4,7 @@ import { ethers } from "hardhat";
 
 describe.only('Escrow', () => {
 
-    const deployOneYearLockFixture = async () => {
+    const deployFixture = async () => {
         const [owner, otherAccount] = await ethers.getSigners();
     
         const Escrow = await ethers.getContractFactory("Escrow");
@@ -16,12 +16,24 @@ describe.only('Escrow', () => {
     describe('Deposit', () => {
         describe('Validations', () => {
             it('Should revert with the right error if send amount is 0', async () => {
-                const { escrow, otherAccount } = await loadFixture(deployOneYearLockFixture);
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
 
                 await expect(escrow.deposit(otherAccount.address)).to.be.revertedWith(
                     'Send value is 0, please set value'
                 );
             })
         })
+
+        describe('Events', () => {
+            it('Should emit an event on deposit', async () => {
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
+                const amount = 1;
+      
+                await expect(escrow.deposit(otherAccount.address, { value: amount }))
+                    .to.emit(escrow, 'Deposited')
+                    .withArgs(otherAccount.address, amount);
+            });
+        });
     })
+
 })
