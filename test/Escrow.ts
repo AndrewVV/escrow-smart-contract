@@ -49,4 +49,50 @@ describe.only('Escrow', () => {
         });
     })
 
+    describe('Withdraw', () => {
+        describe('Validations', () => {
+            it('Should revert with the right error if payee is not msg.sender', async () => {
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
+
+                await expect(escrow.withdraw(otherAccount.address)).to.be.revertedWith(
+                    'Payee is not msg.sender, please change the payee'
+                );
+            })
+
+            it('Should revert with the right error if deposit value for this payee is 0', async () => {
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
+
+                await expect(escrow.connect(otherAccount).withdraw(otherAccount.address)).to.be.revertedWith(
+                    'Deposit value for this payee is 0, please make deposit'
+                );
+            })
+        })
+
+        describe('Events', () => {
+            it('Should emit an event on withdraw', async () => {
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
+                const amount = 1;
+                escrow.deposit(otherAccount.address, { value: amount })
+      
+                await expect(escrow.connect(otherAccount).withdraw(otherAccount.address))
+                    .to.emit(escrow, 'Withdrawn')
+                    .withArgs(otherAccount.address, amount);
+            });
+        });
+
+        describe('Transfers', () => {
+            it('Should withdraw the funds to the payee', async () => {
+                const { escrow, otherAccount } = await loadFixture(deployFixture);
+                const amount = 1;
+                escrow.deposit(otherAccount.address, { value: amount })
+      
+                await expect(escrow.connect(otherAccount).withdraw(otherAccount.address))
+                    .to.changeEtherBalances(
+                        [escrow, otherAccount],
+                        [-amount, amount]
+                    )
+            });
+        });
+    })
+
 })

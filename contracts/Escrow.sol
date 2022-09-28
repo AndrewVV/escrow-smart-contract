@@ -25,7 +25,9 @@ contract Escrow {
     }
 
     function withdraw(address payable payee) public {
+        require(payee == msg.sender, "Payee is not msg.sender, please change the payee");
         uint256 amount = _deposits[payee];
+        require(amount > 0, "Deposit value for this payee is 0, please make deposit");
         _deposits[payee] = 0;
         payee.transfer(amount);
         emit Withdrawn(payee, amount);
