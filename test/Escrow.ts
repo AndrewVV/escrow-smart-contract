@@ -51,19 +51,22 @@ describe.only('Escrow', () => {
 
     describe('Withdraw', () => {
         describe('Validations', () => {
-            it('Should revert with the right error if payee is not msg.sender', async () => {
+            it('Should revert with the right error if status verify is false', async () => {
                 const { escrow, otherAccount } = await loadFixture(deployFixture);
 
                 await expect(escrow.withdraw(otherAccount.address)).to.be.revertedWith(
-                    'Payee is not msg.sender, please change the payee'
+                    'Status verify is false, please ask deposit sender to verify'
                 );
             })
 
-            it('Should revert with the right error if deposit value for this payee is 0', async () => {
+            it('Should revert with the right error if payee is not msg.sender', async () => {
                 const { escrow, otherAccount } = await loadFixture(deployFixture);
+                const amount = 1;
+                escrow.deposit(otherAccount.address, { value: amount })
+                await escrow.verify(otherAccount.address);
 
-                await expect(escrow.connect(otherAccount).withdraw(otherAccount.address)).to.be.revertedWith(
-                    'Deposit value for this payee is 0, please make deposit'
+                await expect(escrow.withdraw(otherAccount.address)).to.be.revertedWith(
+                    'Address payee is not address msg.sender, please change the payee'
                 );
             })
         })
@@ -73,6 +76,7 @@ describe.only('Escrow', () => {
                 const { escrow, otherAccount } = await loadFixture(deployFixture);
                 const amount = 1;
                 escrow.deposit(otherAccount.address, { value: amount })
+                await escrow.verify(otherAccount.address);
       
                 await expect(escrow.connect(otherAccount).withdraw(otherAccount.address))
                     .to.emit(escrow, 'Withdrawn')
@@ -85,6 +89,7 @@ describe.only('Escrow', () => {
                 const { escrow, otherAccount } = await loadFixture(deployFixture);
                 const amount = 1;
                 escrow.deposit(otherAccount.address, { value: amount })
+                await escrow.verify(otherAccount.address);
       
                 await expect(escrow.connect(otherAccount).withdraw(otherAccount.address))
                     .to.changeEtherBalances(
