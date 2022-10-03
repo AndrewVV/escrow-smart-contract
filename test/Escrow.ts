@@ -49,21 +49,10 @@ describe.only('Escrow', () => {
     describe('Withdraw', () => {
         describe('Validations', () => {
             it('Should revert with the right error if status verify is false', async () => {
-                const { escrow, otherAccount } = await loadFixture(deployFixture);
+                const { escrow } = await loadFixture(deployFixture);
 
-                await expect(escrow.withdraw(otherAccount.address)).to.be.revertedWith(
+                await expect(escrow.withdraw()).to.be.revertedWith(
                     'Status verify is false, please ask deposit sender to verify'
-                );
-            });
-
-            it('Should revert with the right error if payee is not msg.sender', async () => {
-                const { escrow, otherAccount } = await loadFixture(deployFixture);
-                const amount = 1;
-                escrow.deposit(otherAccount.address, { value: amount });
-                await escrow.verify(otherAccount.address);
-
-                await expect(escrow.withdraw(otherAccount.address)).to.be.revertedWith(
-                    'Address payee is not address msg.sender, please change the payee'
                 );
             });
         });
@@ -75,7 +64,7 @@ describe.only('Escrow', () => {
                 escrow.deposit(otherAccount.address, { value: amount });
                 await escrow.verify(otherAccount.address);
 
-                await expect(escrow.connect(otherAccount).withdraw(otherAccount.address))
+                await expect(escrow.connect(otherAccount).withdraw())
                     .to.emit(escrow, 'Withdrawn')
                     .withArgs(otherAccount.address, amount);
             });
@@ -88,9 +77,10 @@ describe.only('Escrow', () => {
                 escrow.deposit(otherAccount.address, { value: amount });
                 await escrow.verify(otherAccount.address);
 
-                await expect(
-                    escrow.connect(otherAccount).withdraw(otherAccount.address)
-                ).to.changeEtherBalances([escrow, otherAccount], [-amount, amount]);
+                await expect(escrow.connect(otherAccount).withdraw()).to.changeEtherBalances(
+                    [escrow, otherAccount],
+                    [-amount, amount]
+                );
             });
         });
     });

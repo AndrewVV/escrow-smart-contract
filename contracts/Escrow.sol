@@ -28,16 +28,13 @@ contract Escrow {
         return _sender[payee];
     }
 
-    function withdraw(address payable payee) public {
+    function withdraw() public {
+        address payee = msg.sender;
         bool status = _verify[payee];
         require(status == true, "Status verify is false, please ask deposit sender to verify");
-        require(
-            msg.sender == payee,
-            "Address payee is not address msg.sender, please change the payee"
-        );
         uint256 amount = _deposits[payee];
         _deposits[payee] = 0;
-        payee.transfer(amount);
+        payable(payee).transfer(amount);
         emit Withdrawn(payee, amount);
     }
 
